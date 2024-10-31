@@ -18,8 +18,7 @@ public interface ActionHistoryRepository extends JpaRepository<ActionHistory, Lo
     @Query("SELECT a FROM ActionHistory a WHERE " +
             "(?1 IS NULL OR CAST(a.device AS string) LIKE CONCAT(?1, '%')) AND " +
             "(?2 IS NULL OR CAST(a.action AS string) LIKE CONCAT(?2, '%')) AND " +
-            "(?3 IS NULL OR a.time >= ?3) AND " +
-            "(?4 IS NULL OR a.time <= ?4)")
-    Page<ActionHistory> findByDeviceAndActionAndTime(String device, String action, LocalDateTime timeStart, LocalDateTime timeEnd, Pageable pageable);
+            "(?3 IS NULL OR CAST(a.time AS string) LIKE CONCAT('%', ?3, '%'))")
+    Page<ActionHistory> findByDeviceAndActionAndTime(String device, String action, String time, Pageable pageable);
 
 }

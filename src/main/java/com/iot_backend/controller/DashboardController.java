@@ -29,9 +29,9 @@ public class DashboardController {
     }
 
     @GetMapping("/recent")
-    public ResponseEntity<List<DataSensors>> getRecentDataSensors() {
+    public List<DataSensors> getRecentDataSensors() {
         List<DataSensors> recentData = dataSensorsService.getRecentData();
-        return ResponseEntity.ok(recentData);
+        return recentData;
     }
 
     @GetMapping("/min-max")
@@ -67,5 +67,10 @@ public class DashboardController {
             response.put("message", "Failed to control device.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    @GetMapping("/dust-count")
+    public long getDustCountAboveThresholdToday() {
+        return dataSensorsService.countDustAboveThresholdInCurrentDay();
     }
 }

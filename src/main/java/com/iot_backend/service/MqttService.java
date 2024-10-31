@@ -39,15 +39,21 @@ public class MqttService {
             dataSensors.setTemperature(Double.parseDouble(parseDataSensors[0]));
             dataSensors.setHumidity(Double.parseDouble(parseDataSensors[1]));
             dataSensors.setLight(Double.parseDouble(parseDataSensors[2]));
+            dataSensors.setDust(Double.parseDouble(parseDataSensors[3]));
             dataSensors.setTime(LocalDateTime.now());
             dataSensorsRepository.save(dataSensors);
             System.out.println("Data sensors saved: " + payload);
+
+            if (dataSensors.getDust() > 70) {
+                mqttGateway.sendToMqtt("flash", "topic/control");
+            }
+
         } else if ("topic/control".equals(topic)) {
             // Xử lý phản hồi từ thiết bị điều khiển
             System.out.println("Received control response: " + payload);
         } else if ("topic/status".equals(topic)) {
             String[] controlResponse = payload.split("_");
-            String device = controlResponse[0];  // fan/ac/bulb
+            String device = controlResponse[0];  // fan/ac/bulb/ap
             String status = controlResponse[1];  // on/off
 
             // Cập nhật lịch sử hành động vào DB
@@ -62,6 +68,9 @@ public class MqttService {
                 case "bulb":
                     actionHistory.setDevice("Bulb");
                     break;
+                case "ap", "flash":
+                    actionHistory.setDevice("Air purifier");
+                    break;
             }
             actionHistory.setAction(status.toUpperCase());
             actionHistory.setTime(LocalDateTime.now());
@@ -70,10 +79,12 @@ public class MqttService {
             System.out.println("Action history saved: " + device + " " + status);
 
             // Đếm ngược latch của thiết bị đó nếu tồn tại
-            CountDownLatch latch = latchMap.get(device);
-            if (latch != null) {
-                latch.countDown();
-                latchMap.remove(device);  // Xóa latch sau khi đã sử dụng
+            if (!status.equals("flash")) {
+                CountDownLatch latch = latchMap.get(device);
+                if (latch != null) {
+                    latch.countDown();
+                    latchMap.remove(device);  // Xóa latch sau khi đã sử dụng
+                }
             }
         }
     }
@@ -90,8 +101,8 @@ public class MqttService {
             mqttGateway.sendToMqtt(message, "topic/control");
             System.out.println("Sent control message: " + message);
 
-            // Đợi phản hồi từ thiết bị hoặc timeout sau 15 giây
-            boolean success = latch.await(15, TimeUnit.SECONDS);
+            // Đợi phản hồi từ thiết bị hoặc timeout sau 10 giây
+            boolean success = latch.await(10, TimeUnit.SECONDS);
             if (success) {
                 return true;
             } else {
@@ -103,4 +114,6 @@ public class MqttService {
             return false;
         }
     }
+
+
 }

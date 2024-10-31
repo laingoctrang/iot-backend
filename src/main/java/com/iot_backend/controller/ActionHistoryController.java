@@ -26,13 +26,12 @@ public class ActionHistoryController {
     public Page<ActionHistory> getSearchDataSensors(
             @RequestParam(name = "device", required = false) String device,
             @RequestParam(name = "action", required = false) String action,
-            @RequestParam(name = "date", required = false) String date,
             @RequestParam(name = "time", required = false) String time,
             @RequestParam(name = "sortBy", required = false) String sortBy,
             @RequestParam(name = "sortDir", required = false) String sortDir,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        return actionHistoryService.getSearchActionHistory(device, action, date, time, sortBy, sortDir, page, size);
+        return actionHistoryService.getSearchActionHistory(device, action, time, sortBy, sortDir, page, size);
     }
 }

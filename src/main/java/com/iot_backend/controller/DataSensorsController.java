@@ -54,13 +54,27 @@ public class DataSensorsController {
             @RequestParam(name = "temperature", required = false) String temperature,
             @RequestParam(name = "humidity", required = false) String humidity,
             @RequestParam(name = "light", required = false) String light,
-            @RequestParam(name = "date", required = false) String date,
             @RequestParam(name = "time", required = false) String time,
             @RequestParam(name = "sortBy", required = false) String sortBy,
             @RequestParam(name = "sortDir", required = false) String sortDir,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size
     ) {
-        return dataSensorsService.getSearchDataSensors(temperature, humidity, light, date, time, sortBy, sortDir, page, size);
+        return dataSensorsService.getSearchDataSensors(temperature, humidity, light, time, sortBy, sortDir, page, size);
+    }
+
+    @GetMapping("/2/")
+    public Page<DataSensors> getSearchDataSensors2(
+            @RequestParam(name = "temperature", required = false) String temperature,
+            @RequestParam(name = "humidity", required = false) String humidity,
+            @RequestParam(name = "light", required = false) String light,
+            @RequestParam(name = "dust", required = false) String dust,
+            @RequestParam(name = "time", required = false) String time,
+            @RequestParam(name = "sortBy", required = false) String sortBy,
+            @RequestParam(name = "sortDir", required = false) String sortDir,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size
+    ) {
+        return dataSensorsService.getSearchDataSensors2(temperature, humidity, light, dust, time, sortBy, sortDir, page, size);
     }
 }

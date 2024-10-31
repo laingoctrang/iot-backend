@@ -24,12 +24,15 @@ public class ActionHistoryService {
     public Page<ActionHistory> getSearchActionHistory(
             String device,
             String action,
-            String date,
             String time,
             String sortBy,
             String sortDir,
             int page,
             int size) {
+
+        if (device != null && device.trim().isEmpty()) device = null;
+        if (action != null && action.trim().isEmpty()) action = null;
+        if (time != null && time.trim().isEmpty()) time = null;
 
         Pageable pageable;
 
@@ -45,30 +48,6 @@ public class ActionHistoryService {
             pageable = PageRequest.of(page, size); // Không có sắp xếp
         }
 
-        LocalDateTime timeStart = null;
-        LocalDateTime timeEnd = null;
-
-        if (date != null && !date.isEmpty()) {
-            // Nếu có giá trị `date`, tìm kiếm trong khoảng thời gian của ngày đó
-            LocalDate parsedDate = LocalDate.parse(date); // Parse date theo yyyy-MM-dd
-
-            // Nếu có `time`, kết hợp với `date` thành `datetime`
-            if (time != null && !time.isEmpty()) {
-                LocalTime parsedTime = LocalTime.parse(time); // Parse time theo HH:mm:ss
-                timeStart = LocalDateTime.of(parsedDate, parsedTime); // Kết hợp thành datetime chính xác
-                timeEnd = timeStart.plusSeconds(1); // Tìm đúng giây của bản ghi
-            } else {
-                // Nếu chỉ có `date`, tìm kiếm trong cả ngày
-                timeStart = parsedDate.atStartOfDay(); // Bắt đầu từ 00:00:00
-                timeEnd = parsedDate.atTime(LocalTime.MAX); // Kết thúc tại 23:59:59
-            }
-        } else if (time != null && !time.isEmpty()) {
-            // Nếu chỉ có `time`, tìm tất cả các bản ghi có `time` tương ứng (bất kể ngày)
-            LocalTime parsedTime = LocalTime.parse(time); // Parse time theo HH:mm:ss
-            timeStart = LocalDateTime.of(LocalDate.of(2024, 1, 1), parsedTime); // Sử dụng ngày giả định
-            timeEnd = LocalDateTime.now();
-        }
-
-        return actionHistoryRepository.findByDeviceAndActionAndTime(device, action, timeStart, timeEnd, pageable);
+        return actionHistoryRepository.findByDeviceAndActionAndTime(device, action, time, pageable);
     }
 }

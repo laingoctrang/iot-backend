@@ -53,7 +53,7 @@ public class MqttConfig {
     public MessageProducer inbound() {
         MqttPahoMessageDrivenChannelAdapter adapter =
                 new MqttPahoMessageDrivenChannelAdapter("SpringBootClientInbound", mqttClientFactory(),
-                        "topic/sensor", "topic/control", "topic/status");
+                        "topic/sensor", "topic/control", "topic/status", "topic/waring");
         adapter.setCompletionTimeout(5000);
         adapter.setConverter(new DefaultPahoMessageConverter());
         adapter.setQos(1);

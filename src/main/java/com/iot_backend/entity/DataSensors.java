@@ -24,12 +24,21 @@ public class DataSensors {
     private Double temperature;
     private Double humidity;
     private Double light;
+    private Double dust;
     private LocalDateTime time;
 
-    public DataSensors(Double temperature, Double humidity, Double light, LocalDateTime time) {
+//    public DataSensors(Double temperature, Double humidity, Double light, LocalDateTime time) {
+//        this.temperature = temperature;
+//        this.humidity = humidity;
+//        this.light = light;
+//        this.time = time;
+//    }
+
+    public DataSensors(Double temperature, Double humidity, Double light, Double dust, LocalDateTime time) {
         this.temperature = temperature;
         this.humidity = humidity;
         this.light = light;
+        this.dust = dust;
         this.time = time;
     }
 }

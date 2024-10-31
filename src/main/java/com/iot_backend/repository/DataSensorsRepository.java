@@ -16,8 +16,8 @@ import java.util.Optional;
 public interface DataSensorsRepository extends JpaRepository<DataSensors, Long>, PagingAndSortingRepository<DataSensors, Long> {
     Optional<DataSensors> findTopByOrderByTimeDesc();
     List<DataSensors> findTop20ByOrderByTimeDesc();
-    @Query("SELECT MIN(d.temperature), MAX(d.temperature), MIN(d.humidity), MAX(d.humidity), MIN(d.light), MAX(d.light) " +
-            "FROM DataSensors d WHERE d.time >= :startOfDay AND d.time <= :endOfDay")
+    @Query("SELECT MIN(d.temperature), MAX(d.temperature), MIN(d.humidity), MAX(d.humidity), MIN(d.light), MAX(d.light), MIN(d.dust), MAX(d.dust) " +
+            "FROM DataSensors d WHERE d.time >= ?1 AND d.time <= ?2")
     Object[] findMinMaxValues(LocalDateTime startOfDay, LocalDateTime endOfDay);
 
 //    List<DataSensors> findAllByOrderByTemperatureAsc();
@@ -36,21 +36,7 @@ public interface DataSensorsRepository extends JpaRepository<DataSensors, Long>,
             "(?1 IS NULL OR CAST(d.temperature AS string) LIKE CONCAT(?1, '%')) AND " +
             "(?2 IS NULL OR CAST(d.humidity AS string) LIKE CONCAT(?2, '%')) AND " +
             "(?3 IS NULL OR CAST(d.light AS string) LIKE CONCAT(?3, '%')) AND " +
-            "(?4 IS NULL OR d.time >= ?4) AND " +
-            "(?5 IS NULL OR d.time <= ?5)")
-    Page<DataSensors> findByTemperatureAndHumidityAndLightAndTime(
-            String temperature,
-            String humidity,
-            String light,
-            LocalDateTime timeStart,
-            LocalDateTime timeEnd,
-            Pageable pageable);
-
-    @Query("SELECT d FROM DataSensors d WHERE " +
-            "(?1 IS NULL OR CAST(d.temperature AS string) LIKE CONCAT(?1, '%')) AND " +
-            "(?2 IS NULL OR CAST(d.humidity AS string) LIKE CONCAT(?2, '%')) AND " +
-            "(?3 IS NULL OR CAST(d.light AS string) LIKE CONCAT(?3, '%')) AND " +
-            "(?4 IS NULL OR (CAST(d.time AS string) LIKE CONCAT('%', ?4)))")
+            "(?4 IS NULL OR CAST(d.time AS string) LIKE CONCAT('%', ?4, '%'))")
     Page<DataSensors> findByTemperatureAndHumidityAndLightAndTime(
             String temperature,
             String humidity,
@@ -58,5 +44,24 @@ public interface DataSensorsRepository extends JpaRepository<DataSensors, Long>,
             String time,
             Pageable pageable);
 
+
+
+    @Query("SELECT d FROM DataSensors d WHERE " +
+            "(?1 IS NULL OR CAST(d.temperature AS string) LIKE CONCAT(?1, '%')) AND " +
+            "(?2 IS NULL OR CAST(d.humidity AS string) LIKE CONCAT(?2, '%')) AND " +
+            "(?3 IS NULL OR CAST(d.light AS string) LIKE CONCAT(?3, '%')) AND " +
+            "(?4 IS NULL OR CAST(d.dust AS string) LIKE CONCAT(?4, '%')) AND " +
+            "(?5 IS NULL OR CAST(d.time AS string) LIKE CONCAT('%', ?5, '%'))")
+    Page<DataSensors> findByTemperatureAndHumidityAndLightAndTime2(
+            String temperature,
+            String humidity,
+            String light,
+            String dust,
+            String time,
+            Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM DataSensors s WHERE s.dust > 70 AND s.time BETWEEN :startOfDay AND :endOfDay")
+    long countDustAboveThresholdInDay(LocalDateTime startOfDay, LocalDateTime endOfDay);
 }
+
 
